@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>node.js express - char.html</title>
+    <script>
+        window.onload = () => {
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
+            canvas.width = 1450;
+            canvas.height = 690;
+            ctx.font = 'bold 30px black';
+            function ranNum(lim) {
+                return Math.floor(Math.random() * lim);
+            }
+
+            function Char(al) {
+                this.al = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[al];
+                this.vx = ranNum(100) - ranNum(100);
+                this.vy = ranNum(100) - ranNum(100);
+                this.x = ranNum(canvas.width - 50);
+                this.y = ranNum(canvas.height - 50) + 50;
+                this.color = ranNum(360);
+            }
+
+            Char.prototype.print = function () {
+                ctx.fillStyle = `hsl(${this.color}, 100%, 50%)`;
+                this.color += 3;
+                ctx.fillText(this.al, this.x, this.y);
+            }
+
+            Char.prototype.move = function () {
+                this.x += this.vx / 10;
+                this.y += this.vy / 10;
+                if (this.x < 0 || this.x + 25 > canvas.width) this.vx *= -1;
+                if (this.y - 25 < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+
+            var charArr = [];
+            for (var i = 0; i < 100; i++) {
+                charArr.push(new Char(ranNum(26)));
+            }
+            setInterval(() => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                charArr.forEach((item, index, arr) => {
+                    item.print();
+                    item.move();
+                });
+            }, 1000 / 60);
+        };
+    </script>
+</head>
+
+<body>
+    <canvas id="canvas" style="border: solid 1px black;"></canvas>
+</body>
+
+</html>

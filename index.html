@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>node.js express - index.html</title>
+    <style>
+        div {
+            width: 1450px;
+            height: 690px;
+            display: inline-block;
+        }
+    </style>
+    <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+    <script>
+        $(document).ready(function () {
+            var c = 0;
+            function cc() {
+                $('div').css('background', `linear-gradient(to left, hsl(${c}, 100%, 50%), hsl(${c + 90}, 100%, 50%), hsl(${c + 180}, 100%, 50%), hsl(${c + 270}, 100%, 50%), hsl(${c}, 100%, 50%))`);
+                c++;
+            };
+
+            setInterval(cc, 10);
+        });
+    </script>
+</head>
+
+<body>
+    <div></div>
+</body>
+
+</html>
