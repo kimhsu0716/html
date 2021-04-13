@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Bouncy Ball</title>
+</head>
+
+<body>
+
+    <canvas id="myCanvas" width="750" height="450"
+        style="background-color: beige; border: 2px solid black; margin-left: 350px;"></canvas>
+
+    <script>
+        var canvas = document.getElementById("myCanvas");
+        var ctx = canvas.getContext("2d");
+
+        var targetImg = new Image();
+        targetImg.src = "./imageDB/star.png";
+        const ballRadius = 5;
+        const g = 0.06;
+        var vx = 0;
+        var vy = 0;
+        var ax = -vx * 0.1;
+        var cPos = { x: 10, y: 70 };
+        const brickScale = 30;
+        var rightPressed = false;
+        var leftPressed = false;
+        var upPressed = false;
+        var downPressed = false;
+        var enterPressed = false;
+        var rightPressedTime = 0;
+        var leftPressedTime = 0;
+        var doublePressed = false;
+        var status = "mainMenu";
+        var level = 0;
+        var bricks = {
+            "1-1": [
+                { x: 90, y: 300 },
+                { x: 90, y: 330 },
+                { x: 90, y: 360 },
+                { x: 90, y: 390 },
+                { x: 90, y: 420 },
+                { x: 120, y: 180 },
+                { x: 120, y: 210 },
+                { x: 120, y: 240 },
+                { x: 120, y: 300 },
+                { x: 120, y: 360 },
+                { x: 120, y: 420 },
+                { x: 150, y: 240 },
+                { x: 150, y: 300 },
+                { x: 150, y: 360 },
+                { x: 150, y: 420 },
+                { x: 180, y: 240 },
+                { x: 210, y: 240 },
+                { x: 210, y: 330 },
+                { x: 210, y: 360 },
+                { x: 210, y: 390 },
+                { x: 210, y: 420 },
+                { x: 240, y: 240 },
+                { x: 240, y: 300 },
+                { x: 240, y: 360 },
+                { x: 270, y: 240 },
+                { x: 270, y: 300 },
+                { x: 270, y: 360 },
+                { x: 300, y: 240 },
+                { x: 300, y: 330 },
+                { x: 300, y: 360 },
+                { x: 300, y: 390 },
+                { x: 300, y: 420 },
+                { x: 330, y: 240 },
+                { x: 360, y: 240 },
+                { x: 360, y: 300 },
+                { x: 360, y: 330 },
+                { x: 360, y: 420 },
+                { x: 390, y: 240 },
+                { x: 390, y: 300 },
+                { x: 390, y: 360 },
+                { x: 390, y: 420 },
+                { x: 420, y: 240 },
+                { x: 420, y: 300 },
+                { x: 420, y: 390 },
+                { x: 420, y: 420 },
+                { x: 450, y: 240 },
+                { x: 480, y: 240 },
+                { x: 480, y: 300 },
+                { x: 480, y: 330 },
+                { x: 510, y: 240 },
+                { x: 510, y: 360 },
+                { x: 510, y: 390 },
+                { x: 510, y: 420 },
+                { x: 540, y: 240 },
+                { x: 540, y: 300 },
+                { x: 540, y: 330 },
+                { x: 570, y: 240 },
+                { x: 600, y: 180 },
+                { x: 600, y: 210 },
+                { x: 600, y: 240 },
+                { x: 630, y: 300 },
+                { x: 630, y: 330 },
+                { x: 630, y: 360 },
+                { x: 630, y: 420 }
+            ],
+            "1-2": [
+                { x: 0, y: 180 },
+                { x: 0, y: 210 },
+                { x: 0, y: 240 },
+                { x: 0, y: 270 },
+                { x: 0, y: 300 },
+                { x: 30, y: 300 },
+                { x: 60, y: 300 },
+                { x: 90, y: 300 },
+                { x: 120, y: 300 },
+                { x: 180, y: 270 },
+                { x: 210, y: 270 },
+                { x: 240, y: 270 },
+                { x: 270, y: 270 },
+                { x: 300, y: 270 },
+                { x: 330, y: 270 },
+                { x: 360, y: 270 },
+                { x: 390, y: 270 },
+                { x: 420, y: 270 },
+                { x: 450, y: 270 },
+                { x: 480, y: 270 },
+                { x: 540, y: 300 },
+                { x: 570, y: 300 },
+                { x: 600, y: 300 },
+                { x: 630, y: 300 },
+                { x: 660, y: 300 },
+                { x: 690, y: 300 },
+                { x: 720, y: 180 },
+                { x: 720, y: 210 },
+                { x: 720, y: 240 },
+                { x: 720, y: 270 },
+                { x: 720, y: 300 }
+            ],
+        };
+        var goals = {
+            "1-1": [
+                { x: 150, y: 210, status: 1 },
+                { x: 210, y: 180, status: 1 },
+                { x: 210, y: 210, status: 1 },
+                { x: 270, y: 210, status: 1 },
+                { x: 330, y: 210, status: 1 },
+                { x: 480, y: 210, status: 1 },
+                { x: 540, y: 180, status: 1 },
+                { x: 540, y: 210, status: 1 },
+                { x: 570, y: 210, status: 1 }
+            ],
+            "1-2": [
+                { x: 30, y: 270, status: 1 },
+                { x: 210, y: 240, status: 1 },
+                { x: 330, y: 240, status: 1 },
+                { x: 390, y: 240, status: 1 },
+                { x: 480, y: 240, status: 1 },
+                { x: 570, y: 270, status: 1 },
+                { x: 660, y: 270, status: 1 },
+                { x: 690, y: 270, status: 1 },
+            ],
+        };
+        var menu = 0;
+        var select = [0, 0];
+        var start = false;
+        var selectedLevel = "1-1";
+        var clear = [];
+        var end = false;
+        const cPosList = {
+            "1-1": { x: 375, y: 195 },
+            "1-2": { x: 75, y: 255 },
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (status === "mainMenu") {
+                drawMain();
+            }
+            else if (status === "level") {
+                drawLevelMenu();
+            }
+            else {
+                drawLevel(status);
+            }
+        }
+        function drawBall() {
+            ctx.beginPath();
+            ctx.fillStyle = "#000000";
+            ctx.arc(cPos.x, cPos.y, ballRadius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#FFFF00";
+            ctx.arc(cPos.x, cPos.y, ballRadius - 1, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.closePath();
+            cPos.y += vy;
+            var t = isCollisionTarget();
+            if (t !== false) {
+                goals[selectedLevel][t].status = 0;
+            }
+            if (isHead()) {
+                vy = 0.1;
+            }
+            else if (isCollisionBrickY()) {
+                vy = -2.3;
+            }
+            else {
+                vy += g;
+            }
+            if (rightPressed) {
+                vx = 1.2;
+            }
+            if (leftPressed) {
+                vx = -1.2;
+            }
+            if (doublePressed) {
+                if (!isCollisionBrickY()) {
+                    vy = -2.3;
+                }
+                doublePressed = false;
+            }
+            if (!isCollisionBrickX()) {
+                cPos.x += vx;
+            }
+            else {
+                cPos.x += vx;
+                if (isCollisionBrickX()) {
+                    cPos.x -= vx;
+                }
+            }
+            if (vx > 0) {
+                vx -= 0.04;
+            }
+            else if (vx < 0) {
+                vx += 0.04;
+            }
+            if (Math.abs(vx) < 0.0001) {
+                vx = 0;
+            }
+        }
+        function drawBrick(x, y) {
+            ctx.fillStyle = "#000000";
+            ctx.fillRect(x, y, brickScale, brickScale);
+            ctx.fillStyle = "#C0C0C0";
+            ctx.fillRect(++x, ++y, brickScale - 2, brickScale - 2);
+        }
+        function drawTarget(x, y) {
+            ctx.drawImage(targetImg, x + 2.5, y + 3.5);
+        }
+        function isCollisionBrickY() {
+            for (var i in bricks[selectedLevel]) {
+                i = bricks[selectedLevel][i];
+                if (cPos.x < i.x + brickScale && cPos.x > i.x && cPos.y > i.y - ballRadius && cPos.y < i.y + ballRadius + brickScale) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        function isHead() {
+            for (var i in bricks[selectedLevel]) {
+                i = bricks[selectedLevel][i];
+                if (cPos.x < i.x + brickScale && cPos.x > i.x && cPos.y + vy > i.y + brickScale * 0.5 + ballRadius && cPos.y < i.y + brickScale + ballRadius) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        function isCollisionBrickX() {
+            for (var i in bricks[selectedLevel]) {
+                i = bricks[selectedLevel][i];
+                if (cPos.y < i.y + brickScale && cPos.y > i.y && cPos.x > i.x - ballRadius && cPos.x < i.x + ballRadius + brickScale) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        function drawMain() {
+            ctx.font = "30pt 'A시네마L'";
+            if (menu % 2 === 0) {
+                ctx.fillText("▶ 게임시작", 450, 230);
+                ctx.fillText("옵션", 500, 290);
+            }
+            else if (menu % 2 === 1) {
+                ctx.fillText("게임시작", 500, 230);
+                ctx.fillText("▶ 옵션", 450, 290);
+            }
+            ctx.font = "60pt 'A시네마B'";
+            ctx.fillText("BOUNCE BALL", 50, 120);
+            if (downPressed) {
+                downPressed = false;
+                menu++;
+            }
+            else if (upPressed) {
+                upPressed = false;
+                menu--;
+            }
+            if (menu < 0) {
+                menu += 2;
+            }
+            if (enterPressed) {
+                enterPressed = false;
+                if (menu === 0) {
+                    status = "level";
+                }
+            }
+        }
+        function drawLevelMenu() {
+            ctx.font = "30pt 'A시네마L'";
+            if (level === 0) {
+                ctx.fillText("UNDER WORLD", 250, 50);
+                //ctx.fillText("◀", 20, 250);
+                ctx.fillText("▶", 700, 250);
+            }
+            else if (level === 1) {
+                ctx.fillText("SKY", 330, 50);
+                ctx.fillText("◀", 20, 250);
+                ctx.fillText("▶", 700, 250);
+            }
+            else {
+                ctx.fillText(level + 1, 350, 50);
+                ctx.fillText("◀", 20, 250);
+                ctx.fillText("▶", 700, 250);
+            }
+            for (var i = 0; i < 3; i++) {
+                for (var j = 0; j < 7; j++) {
+                    if (select[0] == i && select[1] == j) {
+                        ctx.strokeStyle = "#FF0000";
+                        ctx.fillStyle = "#FF0000";
+                        ctx.font = "30pt 'A시네마B'";
+                    }
+                    else if (clear.includes(`${level + 1}-${i * 7 + j + 1}`)) {
+                        ctx.strokeStyle = "#0000FF";
+                        ctx.fillStyle = "#0000FF";
+                        ctx.font = "30pt 'A시네마L'";
+                    }
+                    else {
+                        ctx.strokeStyle = "#000000";
+                        ctx.fillStyle = "#000000";
+                        ctx.font = "30pt 'A시네마L'";
+                    }
+                    ctx.strokeRect(j * 80 + 100, 110 + i * 100, 60, 60);
+                    if (i * 7 + j < 9) {
+                        ctx.fillText(i * 7 + j + 1, j * 80 + 120, 155 + i * 100);
+                    }
+                    else {
+                        ctx.fillText(i * 7 + j + 1, j * 80 + 110, 155 + i * 100);
+                    }
+                }
+            }
+            ctx.strokeStyle = "#000000";
+            ctx.fillStyle = "#000000";
+            if (rightPressed) {
+                rightPressed = false;
+                if (select[1] === 6) {
+                    level++;
+                    select[1] = 0;
+                }
+                else {
+                    select[1]++;
+                }
+            }
+            else if (leftPressed) {
+                leftPressed = false;
+                if (select[1] === 0) {
+                    if (level != 0) {
+                        level--;
+                        select[1] = 6;
+                    }
+                }
+                else {
+                    select[1]--;
+                }
+            }
+            else if (upPressed) {
+                upPressed = false;
+                if (select[0] === 0) {
+                    select[0] = 2;
+                }
+                else {
+                    select[0]--;
+                }
+            }
+            else if (downPressed) {
+                downPressed = false;
+                if (select[0] === 2) {
+                    select[0] = 0;
+                }
+                else {
+                    select[0]++;
+                }
+            }
+            else if (enterPressed) {
+                enterPressed = false;
+                status = `${level + 1}-${select[0] * 7 + select[1] + 1}`
+                selectedLevel = status;
+                start = true;
+                for (var i in goals[`${level + 1}-${select[0] * 7 + select[1] + 1}`]) {
+                    i = goals[`${level + 1}-${select[0] * 7 + select[1] + 1}`][i];
+                    i.status = 1;
+                }
+                if (select[1] != 6) {
+                    select[1]++;
+                }
+                else if (select[0] != 2) {
+                    select[0]++;
+                    select[1] = 0;
+                }
+                else {
+                    level++;
+                    select[1] = 0;
+                    select[0] = 0;
+                }
+            }
+        }
+        function drawLevel(selectedLevel) {
+            drawMap();
+            drawBall();
+            if (start) {
+                start = false;
+                end = true;
+                cPos = cPosList[selectedLevel];
+            }
+        }
+        function drawMap() {
+            for (var i in bricks[selectedLevel]) {
+                i = bricks[selectedLevel][i];
+                drawBrick(i.x, i.y);
+            }
+            for (var i in goals[selectedLevel]) {
+                i = goals[selectedLevel][i];
+                if (i.status == 1) {
+                    drawTarget(i.x, i.y);
+                }
+            }
+            if (isClear()) {
+                ctx.font = "100pt 'A시네마L'";
+                ctx.fillStyle = "#000000";
+                ctx.fillText("CLEAR!", 160, 260);
+                clear.push(selectedLevel);
+                if (end) {
+                    end = false;
+                    setTimeout(() => {
+                        status = "level";
+                    }, 2500);
+                }
+            }
+        }
+        function isClear() {
+            for (var i in goals[selectedLevel]) {
+                i = goals[selectedLevel][i];
+                if (i.status === 1) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        function isCollisionTarget() {
+            for (var i = 0; i < goals[selectedLevel].length; i++) {
+                var j = goals[selectedLevel][i];
+                if (cPos.x + ballRadius > j.x + 2.5 && cPos.x - ballRadius < j.x + brickScale - 2.5 && cPos.y + ballRadius > j.y + 1.5 && cPos.y - ballRadius < j.y + brickScale - 1.5) {
+                    return i;
+                }
+            }
+            return false;
+        }
+
+        document.addEventListener("keydown", keyDownHandler, false);
+        document.addEventListener("keyup", keyUpHandler, false);
+
+        function keyDownHandler(e) {
+            if (e.keyCode == 39) {
+                if (new Date().getTime() - rightPressedTime < 200) {
+                    doublePressed = true;
+                    rightPressedTime = 0;
+                }
+                rightPressed = true;
+
+            }
+            else if (e.keyCode == 37) {
+                if (new Date().getTime() - leftPressedTime < 200) {
+                    doublePressed = true;
+                    leftPressedTime = 0;
+                }
+                leftPressed = true;
+            }
+            else if (e.keyCode == 38) {
+                upPressed = true;
+            }
+            else if (e.keyCode == 40) {
+                downPressed = true;
+            }
+            else if (e.keyCode == 13) {
+                enterPressed = true;
+            }
+        }
+        function keyUpHandler(e) {
+            if (e.keyCode == 39) {
+                rightPressed = false;
+                rightPressedTime = new Date().getTime();
+                doublePressed = false;
+            }
+            else if (e.keyCode == 37) {
+                leftPressed = false;
+                doublePressed = false;
+                leftPressedTime = new Date().getTime();
+            }
+            else if (e.keyCode == 38) {
+                upPressed = false;
+            }
+            else if (e.keyCode == 40) {
+                downPressed = false;
+            }
+        }
+
+        setInterval(draw, 10);
+    </script>
+
+</body>
+
+</html>
